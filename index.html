@@ -1,5 +1,7 @@
-<!doctype html><meta charset="utf-8"><title>Supply Hub</title>
-<p style="font:16px Arial;padding:20px">Открываю последнюю версию Supply Hub…</p>
+<!doctype html><meta charset="utf-8"><title>Supply Hub</title><meta name="viewport" content="width=device-width,initial-scale=1">
 <script>
-(async function(){var last=25,miss=0;for(var i=26;i<500&&miss<10;i++){try{var r=await fetch('supply_v'+i+'.html',{method:'HEAD',cache:'no-store'});if(r.ok){last=i;miss=0;}else miss++;}catch(e){miss++;}}location.replace('supply_v'+last+'.html'+location.hash);})();
+(async function(){var K='sh_last_v',last=25;try{last=Math.max(25,parseInt(localStorage.getItem(K),10)||25);}catch(e){}
+var head=function(i){return fetch('supply_v'+i+'.html',{method:'HEAD',cache:'no-store'}).then(function(r){return r.ok?i:0;}).catch(function(){return 0;});};
+for(var from=last+1;from<500;from+=10){var ids=[];for(var i=from;i<from+10;i++)ids.push(i);var ok=(await Promise.all(ids.map(head))).filter(Boolean);if(!ok.length)break;last=Math.max.apply(null,ok);}
+try{localStorage.setItem(K,String(last));}catch(e){}location.replace('supply_v'+last+'.html'+location.hash);})();
 </script>
