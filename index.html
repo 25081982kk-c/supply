@@ -1,5 +1,5 @@
 <!doctype html><meta charset="utf-8"><title>Supply Hub</title>
 <p style="font:16px Arial;padding:20px">Открываю последнюю версию Supply Hub…</p>
 <script>
-(async function(){var last=25;for(var i=26;i<500;i++){try{var r=await fetch('supply_v'+i+'.html',{method:'HEAD',cache:'no-store'});if(r.ok)last=i;else break;}catch(e){break;}}location.replace('supply_v'+last+'.html'+location.hash);})();
+(async function(){var last=25,miss=0;for(var i=26;i<500&&miss<10;i++){try{var r=await fetch('supply_v'+i+'.html',{method:'HEAD',cache:'no-store'});if(r.ok){last=i;miss=0;}else miss++;}catch(e){miss++;}}location.replace('supply_v'+last+'.html'+location.hash);})();
 </script>
