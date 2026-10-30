@@ -9,20 +9,19 @@
   document.body.innerHTML='<div style="font-family:Arial;padding:30px;font-size:18px;line-height:1.5">Теперь добавьте ярлык:<br><br><b>Android (Chrome):</b> ⋮ → «Добавить на главный экран»<br><br><b>iPhone (Safari):</b> «Поделиться» → «На экран Домой»</div>';
   return;
  }
- var go=function(n){location.replace('supply_v'+n+'.html'+location.hash)};
+ var go=function(n){ try{localStorage.setItem('sh_last_ver',n);}catch(e){} location.replace('supply_v'+n+'.html'+location.hash); };
  var live=function(n){return fetch('supply_v'+n+'.html?t='+Date.now(),{method:'HEAD',cache:'no-store'}).then(function(r){return r.ok}).catch(function(){return false})};
+ var last=0; try{ last=+localStorage.getItem('sh_last_ver')||0; }catch(e){}
  var list=[];
  try{
   var r=await fetch('https://api.github.com/repos/25081982kk-c/supply/contents/?t='+Date.now(),{cache:'no-store'});
-  var f=await r.json();
-  list=f.map(function(x){var m=x.name.match(/^supply_v(\d+)\.html$/);return m?+m[1]:0}).filter(Boolean).sort(function(a,b){return b-a});
+  if(r.ok){ var f=await r.json();
+   list=f.map(function(x){var m=x.name.match(/^supply_v(\d+)\.html$/);return m?+m[1]:0}).filter(Boolean).sort(function(a,b){return b-a}); }
  }catch(e){}
- /* берём самую новую, которая уже есть на сайте (новая выкладывается 1–3 мин) */
- for(var i=0;i<list.length;i++){ if(await live(list[i])) return go(list[i]); }
- var ids=[];for(var k=1;k<=200;k++)ids.push(k);
- var ok=await Promise.all(ids.map(function(k){return live(k).then(function(x){return x?k:0})}));
- var n=Math.max.apply(null,ok);
- if(n>0) return go(n);
- document.getElementById('msg').textContent='Не удалось открыть программу. Обновите страницу через минуту.';
+ for(var i=0;i<Math.min(list.length,3);i++){ if(await live(list[i])) return go(list[i]); }
+ /* GitHub не дал список — проверяем по одному несколько номеров от последней открытой */
+ var start=Math.max(last,53);
+ for(var k=start+3;k>=start-2;k--){ if(await live(k)) return go(k); }
+ document.getElementById('msg').textContent='Не удалось открыть программу. Подождите минуту и обновите страницу.';
 })();
 </script></body></html>
